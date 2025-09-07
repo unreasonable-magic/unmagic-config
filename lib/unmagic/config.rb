@@ -44,7 +44,7 @@ module Unmagic
       def config(env_var, type: :string, as: nil, default: nil, validate: {}, scheme: nil)
         # Auto-derive method name if not provided
         method_name = as || derive_method_name(env_var)
-        
+
         # Store config metadata for later use (e.g., dummy value generation)
         @config_metadata ||= {}
         @config_metadata[env_var] = { type: type, scheme: scheme }
@@ -158,7 +158,7 @@ module Unmagic
       def to_hash = to_h
 
       # Derive method name from environment variable name
-      # QUACKBACK_SECRET_KEY_BASE -> secret_key_base (when strip_prefix = "QUACKBACK_")
+      # APP_SECRET_KEY_BASE -> secret_key_base (when strip_prefix = "APP_")
       # SECRET_KEY_BASE -> secret_key_base
       def derive_method_name(env_var)
         name = env_var
@@ -173,9 +173,9 @@ module Unmagic
       # Load environment files and initialize configuration
       def load_configuration!(files: env_files || [ ".env" ], apply_to_env: false)
         return if @configuration_loaded
-        
+
         # Check if we should use dummy values automatically (useful for asset precompilation)
-        @use_dummy_values = ENV["QUACKBACK_CONFIG_USE_DUMMY_VALUES"] == "true"
+        @use_dummy_values = ENV["UNMAGIC_CONFIG_USE_DUMMY_VALUES"] == "true"
 
         # Initialize components
         @env = {}
@@ -237,7 +237,7 @@ module Unmagic
         # Check if required (default is true unless explicitly set to false)
         required = validate.fetch(:required, true)
         using_dummy = false
-        
+
         if required && (value.nil? || (value.respond_to?(:empty?) && value.empty?))
           # Check for individual dummy flag or global dummy mode
           dummy_env = ENV["#{key}_DUMMY"]

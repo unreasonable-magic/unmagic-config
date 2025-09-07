@@ -7,12 +7,12 @@ module Unmagic
     #
     # Example:
     #   namespace :active_storage_primary do
-    #     config "QUACKBACK_ACTIVE_STORAGE_PRIMARY_SERVICE", as: :service
-    #     config "QUACKBACK_ACTIVE_STORAGE_PRIMARY_BUCKET", as: :bucket
+    #     config "APP_ACTIVE_STORAGE_PRIMARY_SERVICE", as: :service
+    #     config "APP_ACTIVE_STORAGE_PRIMARY_BUCKET", as: :bucket
     #   end
     #
-    #   Quackback::Config.active_storage_primary.service  # => "s3"
-    #   Quackback::Config.active_storage_primary.bucket   # => "my-bucket"
+    #   MyApp::Config.active_storage_primary.service  # => "s3"
+    #   MyApp::Config.active_storage_primary.bucket   # => "my-bucket"
     class NamespaceConfig
     def initialize(parent_config, namespace_name)
       @parent_config = parent_config
