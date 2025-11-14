@@ -67,6 +67,8 @@ module Unmagic
             parse_ip_list(env_var, default: default)
           when :object
             fetch_object(env_var)
+          when Class
+            type.new(fetch_string(env_var, default: default, validate: validate))
           else
             raise Error.new("Unknown config type: #{type}")
           end
