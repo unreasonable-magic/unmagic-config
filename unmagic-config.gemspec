@@ -3,11 +3,11 @@
 Gem::Specification.new do |spec|
   spec.name = "unmagic-config"
   spec.version = "0.1.0"
-  spec.authors = [ "Unmagic" ]
-  spec.email = [ "support@unmagic.dev" ]
+  spec.authors = [ "Keith Pitt" ]
+  spec.email = [ "keith@unreasonable-magic.com" ]
   spec.summary = "Configuration management library with environment variable support"
   spec.description = "Provides a DSL for defining environment-based configuration with validation, interpolation, and type conversion"
-  spec.homepage = "https://github.com/unmagic/unmagic-config"
+  spec.homepage = "https://github.com/unreasonable-magic/unmagic-config"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
 
