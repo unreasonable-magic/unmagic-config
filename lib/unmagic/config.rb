@@ -206,6 +206,18 @@ module Unmagic
         @configuration_loaded = true
       end
 
+      # Reload configuration from environment. This clears all cached values
+      # and re-reads from ENV and .env files.
+      def reload!
+        @configuration_loaded = false
+        @env = nil
+        @interpolator = nil
+        @validators = nil
+        @dummy_values = nil
+        @namespaces = nil
+        load_configuration!
+      end
+
       # Helper to get Rails environment without depending on Rails
       def rails_env
         @rails_env ||= ENV["RAILS_ENV"] || "development"

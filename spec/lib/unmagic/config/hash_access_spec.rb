@@ -171,6 +171,61 @@ RSpec.describe "Unmagic::Config hash-like access methods" do
     end
   end
 
+  describe "#reload!" do
+    it "resets configuration loaded state" do
+      test_config_class.instance_variable_set(:@configuration_loaded, false)
+      test_config_class.load_configuration!
+
+      expect(test_config_class.instance_variable_get(:@configuration_loaded)).to eq(true)
+
+      test_config_class.reload!
+
+      expect(test_config_class.instance_variable_get(:@configuration_loaded)).to eq(true)
+      expect(test_config_class.instance_variable_get(:@env)).not_to be_nil
+      expect(test_config_class.instance_variable_get(:@interpolator)).not_to be_nil
+    end
+
+    it "clears namespace caches" do
+      namespace_config_class = Class.new(Unmagic::Config) do
+        self.env_files = []
+        self.strip_prefix = "TEST_"
+
+        namespace :email do
+          config "TEST_EMAIL_FROM", as: :from, default: "default@example.com"
+        end
+      end
+
+      namespace_config_class.instance_variable_set(:@configuration_loaded, false)
+
+      # Access namespace to initialize it
+      expect(namespace_config_class.email.from).to eq("default@example.com")
+      expect(namespace_config_class.instance_variable_get(:@namespaces)).not_to be_nil
+
+      # Reload should clear namespaces
+      namespace_config_class.reload!
+
+      # After reload, can still access namespace
+      expect(namespace_config_class.email.from).to eq("default@example.com")
+    end
+
+    it "picks up ENV changes after reload" do
+      test_config_class.instance_variable_set(:@configuration_loaded, false)
+
+      # Initial load without ENV var
+      ENV.delete("TEST_SECRET_KEY")
+      expect(test_config_class.secret_key).to eq("default-secret")
+
+      # Set ENV var and reload
+      ENV["TEST_SECRET_KEY"] = "new-value"
+      test_config_class.reload!
+
+      expect(test_config_class.secret_key).to eq("new-value")
+
+      # Clean up
+      ENV.delete("TEST_SECRET_KEY")
+    end
+  end
+
   describe "real TestConfig" do
     it "supports bracket access" do
       expect(TestConfig).to respond_to(:[])
