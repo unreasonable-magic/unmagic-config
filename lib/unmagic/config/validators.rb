@@ -91,7 +91,7 @@ module Unmagic
 
     # Parse an integer value
     def parse_integer(value, key:)
-      return nil if value.nil? || value.empty?
+      return nil if value.nil? || value.to_s.strip.empty?
 
       begin
         Integer(value)
@@ -102,9 +102,9 @@ module Unmagic
 
     # Parse a boolean value
     def parse_boolean(value, key:)
-      return nil if value.nil? || value.empty?
+      return nil if value.nil? || value.to_s.strip.empty?
 
-      case value.to_s.downcase
+      case value.to_s.downcase.strip
       when "true", "1", "yes", "on"
         true
       when "false", "0", "no", "off"
