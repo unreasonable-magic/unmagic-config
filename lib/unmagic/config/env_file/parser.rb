@@ -51,10 +51,11 @@ module Unmagic
       def remove_quotes(raw_value)
         return "" if raw_value.nil? || raw_value.empty?
 
-        # Handle quoted strings
-        if raw_value.start_with?('"') && raw_value.end_with?('"')
-          # Remove surrounding double quotes and handle escape sequences
-          content = raw_value[1..-2]
+        # Strip inline comments after quoted values
+        # Match: optional whitespace, quote, content, quote, optional whitespace, optional comment
+        if raw_value =~ /\A\s*"((?:[^"\\]|\\.)*)"\s*(?:#.*)?\z/
+          # Double quoted - handle escape sequences
+          content = Regexp.last_match(1)
           content.gsub(/\\(.)/) do |match|
             case Regexp.last_match(1)
             when "n" then "\n"
@@ -65,12 +66,12 @@ module Unmagic
             else match
             end
           end
-        elsif raw_value.start_with?("'") && raw_value.end_with?("'")
-          # Remove surrounding single quotes, only handle escaped single quotes
-          raw_value[1..-2].gsub(/\\'/, "'")
+        elsif raw_value =~ /\A\s*'((?:[^'\\]|\\.)*)'\s*(?:#.*)?\z/
+          # Single quoted - only handle escaped single quotes
+          Regexp.last_match(1).gsub(/\\'/, "'")
         else
-          # Unquoted value - return as-is
-          raw_value
+          # Unquoted value - strip inline comments
+          raw_value.sub(/\s*#.*\z/, "").strip
         end
       end
       end
