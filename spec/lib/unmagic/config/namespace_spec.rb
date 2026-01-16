@@ -20,6 +20,11 @@ RSpec.describe "Unmagic::Config namespace functionality" do
         config "TEST_CACHE_PROVIDER", as: :provider, default: "redis"
         config "TEST_CACHE_TTL", type: :integer, as: :ttl, default: 3600
       end
+
+      namespace :email do
+        config "TEST_EMAIL_SMTP_PORT", type: :integer, as: :smtp_port, default: nil, validate: { required: false }
+        config "TEST_EMAIL_SMTP_TLS", type: :boolean, as: :smtp_tls, default: false, validate: { required: false }
+      end
     end
   end
 
@@ -31,6 +36,8 @@ RSpec.describe "Unmagic::Config namespace functionality" do
     ENV.delete("TEST_DATABASE_URL")
     ENV.delete("TEST_CACHE_PROVIDER")
     ENV.delete("TEST_CACHE_TTL")
+    ENV.delete("TEST_EMAIL_SMTP_PORT")
+    ENV.delete("TEST_EMAIL_SMTP_TLS")
 
     # Force configuration to reload
     test_config_class.instance_variable_set(:@configuration_loaded, false)
@@ -258,6 +265,38 @@ RSpec.describe "Unmagic::Config namespace functionality" do
 
     it "maintains backward compatibility with legacy object access" do
       expect(TestConfig).to respond_to(:active_storage_primary_legacy)
+    end
+  end
+
+  describe "optional integer and boolean types" do
+    it "allows optional integers with default: nil and validate: { required: false }" do
+      # Should not raise error when not set
+      expect { test_config_class.email.smtp_port }.not_to raise_error
+      expect(test_config_class.email.smtp_port).to be_nil
+    end
+
+    it "allows optional booleans with validate: { required: false }" do
+      # Should not raise error when not set
+      expect { test_config_class.email.smtp_tls }.not_to raise_error
+      expect(test_config_class.email.smtp_tls).to eq(false)
+    end
+
+    context "with environment variables set" do
+      before do
+        ENV["TEST_EMAIL_SMTP_PORT"] = "587"
+        ENV["TEST_EMAIL_SMTP_TLS"] = "true"
+
+        # Force configuration to reload
+        test_config_class.instance_variable_set(:@configuration_loaded, false)
+      end
+
+      it "reads integer values from environment" do
+        expect(test_config_class.email.smtp_port).to eq(587)
+      end
+
+      it "reads boolean values from environment" do
+        expect(test_config_class.email.smtp_tls).to eq(true)
+      end
     end
   end
 end

@@ -288,8 +288,10 @@ module Unmagic
       end
 
       # Parse an integer with optional default
-      def parse_integer(key, default: nil)
-        value = fetch_string(key, default: default&.to_s, validate: { required: default.nil? })
+      def parse_integer(key, default: nil, validate: {})
+        # Merge provided validate with default behavior (required if no default)
+        merged_validate = { required: default.nil? }.merge(validate)
+        value = fetch_string(key, default: default&.to_s, validate: merged_validate)
 
         return default if value.empty? && !default.nil?
 
@@ -297,8 +299,10 @@ module Unmagic
       end
 
       # Parse a boolean value with optional default
-      def parse_boolean(key, default: nil)
-        value = fetch_string(key, default: default&.to_s, validate: { required: default.nil? })
+      def parse_boolean(key, default: nil, validate: {})
+        # Merge provided validate with default behavior (required if no default)
+        merged_validate = { required: default.nil? }.merge(validate)
+        value = fetch_string(key, default: default&.to_s, validate: merged_validate)
 
         return default if value.empty?
 

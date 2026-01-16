@@ -43,9 +43,9 @@ module Unmagic
         when :string
           @parent_config.send(:fetch_string, env_var, default: default, validate: validate)
         when :integer
-          @parent_config.send(:parse_integer, env_var, default: default)
+          @parent_config.send(:parse_integer, env_var, default: default, validate: validate)
         when :boolean
-          @parent_config.send(:parse_boolean, env_var, default: default)
+          @parent_config.send(:parse_boolean, env_var, default: default, validate: validate)
         when :url
           @parent_config.send(:parse_url, env_var, default: default, validate: validate)
         when :ip_list
